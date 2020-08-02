@@ -164,11 +164,12 @@ def kakao_callback(request):
             raise KakaoException("Can't get authorization code.")
         access_token = token_json.get("access_token")
         profile_request = requests.get(
-            "https://kapi.kakao.com/v1/user/me",
+            "https://kapi.kakao.com/v2/user/me",
             headers={"Authorization": f"Bearer {access_token}"},
         )
         profile_json = profile_request.json()
-        email = profile_json.get("kaccount_email", None)
+        kakao_account = profile_json.get("kakao_account")
+        email = kakao_account.get("email", None)
         if email is None:
             raise KakaoException("Please also give me your email")
         properties = profile_json.get("properties")

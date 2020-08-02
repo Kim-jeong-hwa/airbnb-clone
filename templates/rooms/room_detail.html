@@ -22,7 +22,7 @@
                     <h4 class="text-3xl font-medium mb-px">{{room.name}}</h4>
                     <span class="text-gray-700 font-light">{{room.city}}</span>
                 </div>
-                <div>
+                <div class="flex flex-col items-center">
                     {% include "mixins/user_avatar.html" with user=room.host %}
                     {{room.host.first_name}}
                 </div>
