@@ -5,6 +5,7 @@ from django.views.generic import FormView, DetailView, UpdateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, reverse
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
@@ -164,12 +165,11 @@ def kakao_callback(request):
             raise KakaoException("Can't get authorization code.")
         access_token = token_json.get("access_token")
         profile_request = requests.get(
-            "https://kapi.kakao.com/v2/user/me",
+            "https://kapi.kakao.com/v1/user/me",
             headers={"Authorization": f"Bearer {access_token}"},
         )
         profile_json = profile_request.json()
-        kakao_account = profile_json.get("kakao_account")
-        email = kakao_account.get("email", None)
+        email = profile_json.get("kaccount_email", None)
         if email is None:
             raise KakaoException("Please also give me your email")
         properties = profile_json.get("properties")
@@ -237,8 +237,8 @@ class UpdateProfileView(mixins.LoggedInOnlyView, SuccessMessageMixin, UpdateView
 
 
 class UpdatePasswordView(
-    mixins.EmailLoginOnlyView,
     mixins.LoggedInOnlyView,
+    mixins.EmailLoginOnlyView,
     SuccessMessageMixin,
     PasswordChangeView,
 ):
@@ -257,3 +257,12 @@ class UpdatePasswordView(
 
     def get_success_url(self):
         return self.request.user.get_absolute_url()
+
+
+@login_required
+def switch_hosting(request):
+    try:
+        del request.session["is_hosting"]
+    except KeyError:
+        request.session["is_hosting"] = True
+    return redirect(reverse("core:home"))
