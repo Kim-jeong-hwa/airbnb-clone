@@ -47,9 +47,6 @@ class User(AbstractUser):
         (LOGING_KAKAO, "Kakao"),
     )
 
-    first_name = models.CharField(
-        _("first name"), max_length=30, blank=True, default="Unnamed User"
-    )
     avatar = models.ImageField(upload_to="avatars", blank=True)
     gender = models.CharField(
         _("gender"), choices=GENDER_CHOICES, max_length=10, blank=True
@@ -72,7 +69,7 @@ class User(AbstractUser):
     login_method = models.CharField(
         max_length=50, choices=LOGIN_CHOICES, default=LOGIN_EMAIL
     )
-    objects = core_managers.CustomUserManager()
+    objects = core_managers.CustomModelManager()
 
     def get_absolute_url(self):
         return reverse("users:profile", kwargs={"pk": self.pk})
